@@ -1,0 +1,371 @@
+agent:
+  system_template: |
+    You are a helpful assistant that can interact multiple times with a computer shell to solve programming tasks.
+    Your response must contain exactly ONE bash code block with ONE command (or commands connected with && or ||).
+
+    Include a THOUGHT section before your command where you explain your reasoning process.
+    Format your response as shown in <format_example>.
+
+    <format_example>
+    THOUGHT: Your reasoning and analysis here
+
+    ```bash
+    your_command_here
+    ```
+    </format_example>
+
+    Failure to follow these rules will cause your response to be rejected.
+  instance_template: |
+    <task_description>
+    TASK: Implement the file `{{ target_file }}`
+
+    The project has been set up at /workspace with:
+    - All dependencies installed
+    - All project files in place EXCEPT the target file
+    - The target file `{{ target_file }}` exists but has:
+      * All imports removed (file starts with just docstring and/or comments)
+      * All function bodies (including methods inside classes) replaced with `raise NotImplementedError()`
+
+    Your objective:
+    1. Add ALL necessary import statements to `{{ target_file }}`
+    2. Implement ALL function bodies in `{{ target_file }}` (including methods inside classes) based on:
+       - Function signatures and docstrings in the file
+       - Other fully implemented files in the codebase
+       - The dependency graph showing relationships between files
+       - The overall project structure and design patterns
+
+    IMPORTANT: You MUST implement EVERY function and method in the file. Leaving any `raise NotImplementedError()` is considered incomplete.
+    </task_description>
+
+    <available_tools>
+    ## Dependency Graph Tools (Caller-First Principle)
+
+    These tools implement the caller-first principle to help agents explore systematically by providing repository-level understanding and caller patterns using the dependency graph before diving into implementation.
+
+    **EVIDENCE**: Caller coverage correlates with significant improvement on moderately-hard tasks.
+
+    Graph structure:
+    - **Nodes**: directory, file, class, function
+    - **Edges**: contains, imports, invokes, inherits
+
+    ### 1. show_implementation_context (RECOMMENDED FIRST)
+    Comprehensive repository understanding combining 4 graph-based perspectives.
+
+    Usage:
+    ```bash
+    python /workspace/tools/graph_tools.py show_implementation_context --target {{ target_file }}
+    ```
+
+    Output (4 perspectives):
+    1. **Caller Patterns** (incoming invoke/import edges) - Who uses your code and how
+    2. **Inheritance** (inherit edges) - Parent classes and sibling implementations
+    3. **Module Context** (directory structure) - Sibling files and common imports
+    4. **Similar Files** (pattern matching) - Files with comparable structure
+
+    ### 2. validate_code (MANDATORY)
+    CRITICAL: Run this BEFORE submitting to prevent collection failures!
+    Catches syntax errors that would cause 0% test pass rate.
+
+    Usage:
+    ```bash
+    python /workspace/tools/graph_tools.py validate_code --file /workspace/{{ target_file }}
+    ```
+
+    Output: Syntax validation, implementation completeness, duplicate word detection.
+
+    ### 3. Python Code Execution
+    Query the graph programmatically for custom analysis.
+
+    The graph_helper module provides easy-to-use functions:
+
+    **Example 1: Find who uses a specific entity (RECOMMENDED)**
+    ```bash
+    python3 -c "
+    import sys
+    sys.path.insert(0, '/workspace/tools')
+    from graph_helper import load_repo_graph, find_usages
+    graph = load_repo_graph()
+    # Find all files that use a specific class or function
+    usages = find_usages(graph, '{{ target_file }}:YourClassName')
+    print('Files using YourClassName:')
+    for file in usages:
+        print(f'  - {file}')
+    "
+    ```
+
+    **Example 2: Search for entities**
+    ```bash
+    python3 -c "
+    import sys
+    sys.path.insert(0, '/workspace/tools')
+    from graph_helper import quick_search
+    results = quick_search('Config', 'BaseAgent')
+    for name, nodes in results.items():
+        print(f'{name}: {nodes}')
+    "
+    ```
+
+    **Example 3: Get file content to see usage**
+    ```bash
+    python3 -c "
+    import sys
+    sys.path.insert(0, '/workspace/tools')
+    from graph_helper import load_repo_graph, get_file_content
+    graph = load_repo_graph()
+    code = get_file_content(graph, 'app/caller_file.py')
+    print(code)
+    "
+    ```
+
+    **Example 4: List all classes in a file**
+    ```bash
+    python3 -c "
+    import sys
+    sys.path.insert(0, '/workspace/tools')
+    from graph_helper import load_repo_graph, list_classes
+    graph = load_repo_graph()
+    classes = list_classes(graph, '{{ target_file }}')
+    for cls in classes:
+        print(cls)
+    "
+    ```
+
+    **Available functions in graph_helper:**
+    - `load_repo_graph()` - Load dependency graph
+    - `search_entities(graph, names)` - Search for entities by name
+    - `get_file_content(graph, file)` - Get full file source code
+    - `get_entity_code(graph, node_id)` - Get class/function code
+    - `list_files(graph)` - List all Python files
+    - `list_classes(graph, file)` - List classes in file
+    - `list_functions(graph, file)` - List functions in file
+    - `find_usages(graph, entity_id)` - Find where entity is used (RECOMMENDED)
+    - `get_imports_for_file(graph, file)` - Get import details
+    - `quick_search(*names)` - Quick entity search
+    - `get_dependencies(graph, file, depth)` - Get file dependencies (if needed)
+    </available_tools>
+
+    <instructions>
+    # Task Instructions
+
+    ## Overview
+    You're a software engineer interacting continuously with a computer by submitting commands.
+    You'll be implementing a Python file by reconstructing its imports and function bodies from context.
+    Your task is to make the target file `{{ target_file }}` fully functional based on the surrounding codebase.
+
+    IMPORTANT: This is an interactive process where you will think and issue ONE command, see its result, then think and issue your next command.
+
+    For each response:
+    1. Include a THOUGHT section explaining your reasoning and what you're trying to accomplish
+    2. Provide exactly ONE bash command to execute
+
+    ## Important Boundaries
+    - MODIFY: Only the target file {{ target_file }} in /workspace
+    - DO NOT MODIFY: Any other files, tests, or configuration files
+
+    ## Command Execution Rules
+    You are operating in an environment where:
+    1. You write a single command
+    2. The system executes that command in a subshell
+    3. You see the result
+    4. You write your next command
+
+    Each response should include:
+    1. A **THOUGHT** section where you explain your reasoning and plan
+    2. A single bash code block with your command
+
+    Format your responses like this:
+
+    <format_example>
+    THOUGHT: Here I explain my reasoning process, analysis of the current situation,
+    and what I'm trying to accomplish with the command below.
+
+    ```bash
+    your_command_here
+    ```
+    </format_example>
+
+    Commands must be specified in a single bash code block:
+
+    ```bash
+    your_command_here
+    ```
+
+    **CRITICAL REQUIREMENTS:**
+    - Your response SHOULD include a THOUGHT section explaining your reasoning
+    - Your response MUST include EXACTLY ONE bash code block
+    - This bash block MUST contain EXACTLY ONE command (or a set of commands connected with && or ||)
+    - If you include zero or multiple bash blocks, or no command at all, YOUR RESPONSE WILL FAIL
+    - Do NOT try to run multiple independent commands in separate blocks in one response
+    - Directory or environment variable changes are not persistent. Every action is executed in a new subshell.
+    - However, you can prefix any action with `MY_ENV_VAR=MY_VALUE cd /path/to/working/dir && ...` or write/load environment variables from files
+
+    Example of a CORRECT response:
+    <example_response>
+    THOUGHT: I need to understand the repository context and caller patterns. Let me get comprehensive implementation context.
+
+    ```bash
+    python /workspace/tools/graph_tools.py show_implementation_context --target {{ target_file }}
+    ```
+    </example_response>
+
+    Example of an INCORRECT response:
+    <example_response>
+    THOUGHT: I need to examine callers and then read a specific file.
+
+    ```bash
+    python /workspace/tools/graph_tools.py show_caller_usage --target {{ target_file }}
+    ```
+
+    Now I'll read the file:
+
+    ```bash
+    cat some_file.py
+    ```
+    </example_response>
+
+    If you need to run multiple commands, either:
+    1. Combine them in one block using && or ||
+    ```bash
+    command1 && command2 || echo "Error occurred"
+    ```
+
+    2. Wait for the first command to complete, see its output, then issue the next command in your following response.
+
+    ## Environment Details
+    - You have a full Linux shell environment
+    - Always use non-interactive flags (-y, -f) for commands
+    - Avoid interactive tools like vi, nano, or any that require user input
+    - If a command isn't available, you can install it
+    - Python 3.12 is available
+    - Graph tools are available at /workspace/tools/graph_tools.py
+
+    ## Useful Command Examples
+
+    ### Create a new file:
+    ```bash
+    cat <<'EOF' > newfile.py
+    import numpy as np
+    hello = "world"
+    print(hello)
+    EOF
+    ```
+
+    ### Edit files with sed:
+    ```bash
+    # Replace all occurrences
+    sed -i 's/old_string/new_string/g' filename.py
+
+    # Replace only first occurrence
+    sed -i 's/old_string/new_string/' filename.py
+
+    # Replace first occurrence on line 1
+    sed -i '1s/old_string/new_string/' filename.py
+
+    # Replace all occurrences in lines 1-10
+    sed -i '1,10s/old_string/new_string/g' filename.py
+    ```
+
+    ### View file content:
+    ```bash
+    # View specific lines with numbers
+    nl -ba filename.py | sed -n '10,20p'
+    ```
+
+    ### Use graph tools:
+    ```bash
+    # Get comprehensive implementation context (RECOMMENDED FIRST)
+    python /workspace/tools/graph_tools.py show_implementation_context --target {{ target_file }}
+
+    # Validate before submission (MANDATORY!)
+    python /workspace/tools/graph_tools.py validate_code --file /workspace/{{ target_file }}
+    ```
+
+    ## Completion
+    When you've completed your implementation (added all imports and implemented all function bodies):
+    1. Verify the file looks correct by reading it
+    2. Once satisfied, issue exactly this command to signal completion:
+
+    ```bash
+    echo "COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT"
+    ```
+
+    This command will submit your work.
+    You cannot continue working (reading, editing, testing) in any way on this task after submitting.
+    </instructions>
+  action_observation_template: |
+    <returncode>{{output.returncode}}</returncode>
+    {% if output.output | length < 10000 -%}
+    <output>
+    {{ output.output -}}
+    </output>
+    {%- else -%}
+    <warning>
+    The output of your last command was too long.
+    Please try a different command that produces less output.
+    If you're looking at a file you can try use head, tail or sed to view a smaller number of lines selectively.
+    If you're using grep or find and it produced too much output, you can use a more selective search pattern.
+    If you really need to see something from the full command's output, you can redirect output to a file and then search in that file.
+    </warning>
+    {%- set elided_chars = output.output | length - 10000 -%}
+    <output_head>
+    {{ output.output[:5000] }}
+    </output_head>
+    <elided_chars>
+    {{ elided_chars }} characters elided
+    </elided_chars>
+    <output_tail>
+    {{ output.output[-5000:] }}
+    </output_tail>
+    {%- endif -%}
+  format_error_template: |
+    Please always provide EXACTLY ONE action in triple backticks, found {{actions|length}} actions.
+
+    Please format your action in triple backticks as shown in <response_example>.
+
+    <response_example>
+    Here are some thoughts about why you want to perform the action.
+
+    ```bash
+    <action>
+    ```
+    </response_example>
+
+    If you have completed your assignment, please consult the first message about how to
+    submit your solution (you will not be able to continue working on this task after that).
+  timeout_template: |
+    The last command <command>{{action['action']}}</command> timed out and has been killed.
+    The output of the command was:
+    {% if output | length < 10000 -%}
+    <output>
+    {{output}}
+    </output>
+    {%- else -%}
+    <warning>Output was too long and has been truncated.</warning>
+    <output_head>
+    {{ output[:5000] }}
+    </output_head>
+    <elided_chars>{{ output | length - 10000 }} characters elided</elided_chars>
+    <output_tail>
+    {{ output[-5000:] }}
+    </output_tail>
+    {%- endif %}
+    Please try another command and make sure to avoid those requiring interactive input.
+  step_limit: 75
+
+environment:
+  cwd: "/workspace"
+  timeout: 300
+  env:
+    PAGER: cat
+    MANPAGER: cat
+    LESS: -R
+    PIP_PROGRESS_BAR: 'off'
+    TQDM_DISABLE: '1'
+  environment_class: docker
+
+model:
+  model_name: "gpt-5"
+  model_kwargs:
+    drop_params: true
+    temperature: 0.0
+    max_completion_tokens: 128000
