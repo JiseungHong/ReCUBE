@@ -117,5 +117,13 @@ Results are saved to `results/{setting}/{model}/overall_statistics.json`:
 ## Citation
 
 ```bibtex
-TBD
+@misc{hong2026recubeevaluatingrepositorylevelcontext,
+      title={ReCUBE: Evaluating Repository-Level Context Utilization in Code Generation}, 
+      author={Jiseung Hong and Benjamin G. Ascoli and Jinho D. Choi},
+      year={2026},
+      eprint={2603.25770},
+      archivePrefix={arXiv},
+      primaryClass={cs.SE},
+      url={https://arxiv.org/abs/2603.25770}, 
+}
 ```
