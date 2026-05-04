@@ -17,6 +17,7 @@ A benchmark for evaluating LLMs on repository-level context utilization.
 
 ## Introduction
 
+[This is a fully anonymized GitHub repository for NeurIPS 2026 E&D track submission.]
 ReCUBE evaluates LLMs' ability to reconstruct complete, functional code files within real-world repositories:
 
 - **Repository-level understanding:** Full codebase context with multiple files and dependencies
