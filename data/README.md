@@ -34,16 +34,16 @@ All data files are hosted on Hugging Face and can be downloaded using:
 pip install huggingface_hub
 
 # Download the entire dataset
-huggingface-cli download wlqmfl1999/recube-data --repo-type=dataset --local-dir data/
+huggingface-cli download recube-anon-2026/recube-data --repo-type=dataset --local-dir data/
 
 # Or download in Python
 from huggingface_hub import snapshot_download
-snapshot_download(repo_id="wlqmfl1999/recube-data", repo_type="dataset", local_dir="data/")
+snapshot_download(repo_id="recube-anon-2026/recube-data", repo_type="dataset", local_dir="data/")
 ```
 
 Alternatively, you can clone the repository:
 ```bash
-git clone https://huggingface.co/datasets/wlqmfl1999/recube-data data/
+git clone [https://huggingface.co/datasets/recube-anon-2026/recube-data](https://huggingface.co/datasets/recube-anon-2026/recube-data) data/
 ```
 
 ## Graphs (`graphs/`)
@@ -130,7 +130,7 @@ tests/
 │   └── ...
 ```
 
-**Note**: These files are copied into Docker images (`wlqmfl0990/recube:{repo_id}`) and do not need to be manually managed during evaluation.
+**Note**: These files are copied into Docker images and do not need to be manually managed during evaluation.
 
 ### `test_metadata.json`
 ```json
@@ -199,7 +199,20 @@ External vs internal test classifications for analyzing model capabilities.
 
 366 verified target files used for official evaluation (i.e., 40 functional subset, 366 instances).
 
-**Format**: Same as `target.json`
+**Format**:
+```json
+[
+  {
+    "repo_id": 0,
+    "selected_files": [
+      "app/agent/base.py",
+      "app/agent/manus.py",
+      ...
+    ]
+  },
+  ...
+]
+```
 
 **Usage**: Used by generation and evaluation scripts to determine which files to process.
 

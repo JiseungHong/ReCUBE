@@ -5,13 +5,10 @@
 <h1 align="center">ReCUBE: Repository-Level Code Reconstruction Benchmark</h1>
 
 <p align="center">
-  <a href="#">
-    <img src="https://img.shields.io/badge/📄_arXiv-2501.xxxxx-b31b1b" alt="arXiv Paper"/>
-  </a>
-  <a href="https://huggingface.co/datasets/wlqmfl1999/recube-data">
+  <a href="https://huggingface.co/datasets/recube-anon-2026/recube-data">
     <img src="https://img.shields.io/badge/🤗_dataset-recube--data-yellow" alt="HuggingFace Dataset"/>
   </a>
-  <a href="https://hub.docker.com/repository/docker/wlqmfl0990/recube">
+  <a href="https://hub.docker.com/r/recubeanon2026/recube">
     <img src="https://img.shields.io/badge/🐳_docker-recube-blue" alt="Docker Images"/>
   </a>
 </p>
@@ -39,14 +36,14 @@ ReCUBE evaluates LLMs' ability to reconstruct complete, functional code files wi
 ### Installation
 
 ```bash
-git clone https://github.com/JiseungHong/ReCUBE.git
+git clone THIS REPO
 cd ReCUBE
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
 # Download benchmark data
 pip install huggingface_hub
-huggingface-cli download wlqmfl1999/recube-data --repo-type=dataset --local-dir data/
+huggingface-cli download recube-anon-2026/recube-data --repo-type=dataset --local-dir data/
 
 # Set API key (for API-based models)
 export OPENAI_API_KEY="your-api-key-here"
@@ -113,17 +110,3 @@ Results are saved to `results/{setting}/{model}/overall_statistics.json`:
 - **Average Pass Rate (APR):** Average pass rate across all instances
 - **Strict Pass Rate (SPR):** Percentage of fully resolved instances (100% tests passed)
 - **External/internal breakdown:** Tests classified by usage patterns (API contract vs implementation)
-
-## Citation
-
-```bibtex
-@misc{hong2026recubeevaluatingrepositorylevelcontext,
-      title={ReCUBE: Evaluating Repository-Level Context Utilization in Code Generation}, 
-      author={Jiseung Hong and Benjamin G. Ascoli and Jinho D. Choi},
-      year={2026},
-      eprint={2603.25770},
-      archivePrefix={arXiv},
-      primaryClass={cs.SE},
-      url={https://arxiv.org/abs/2603.25770}, 
-}
-```
