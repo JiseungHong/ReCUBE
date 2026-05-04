@@ -144,12 +144,12 @@ if [ ! -d "data/prompts" ]; then
     print_warning "Data directory not found: data/prompts"
     print_info "Downloading data from Hugging Face..."
     pip install -q huggingface_hub
-    huggingface-cli download wlqmfl1999/recube-data --repo-type=dataset --local-dir data/
+    huggingface-cli download recube-anon-2026/recube-data --repo-type=dataset --local-dir data/
 fi
 
 if [ ! -f "data/target.json" ]; then
     print_error "Target file not found: data/target.json"
-    print_info "Please download data first using: huggingface-cli download wlqmfl1999/recube-data --repo-type=dataset --local-dir data/"
+    print_info "Please download data first using: huggingface-cli download recube-anon-2026/recube-data --repo-type=dataset --local-dir data/"
     exit 1
 fi
 
@@ -157,7 +157,7 @@ fi
 if [[ "$SETTING" == *"cce"* ]]; then
     if [ ! -d "data/graphs" ]; then
         print_error "Graphs directory not found: data/graphs"
-        print_error "Please download data using: huggingface-cli download wlqmfl1999/recube-data --repo-type=dataset --local-dir data/"
+        print_error "Please download data using: huggingface-cli download recube-anon-2026/recube-data --repo-type=dataset --local-dir data/"
         exit 1
     fi
 fi

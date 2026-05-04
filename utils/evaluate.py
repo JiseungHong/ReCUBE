@@ -18,7 +18,7 @@ Input Paths:
     - Test metadata: data/tests/{repo_id}/test_metadata.json
     - Test classifications: data/test_classifications/{repo_id}.json
     - Target data: data/target.json
-    - Docker images: wlqmfl0990/recube:{repo_id}
+    - Docker images: recubeanon2026/recube:{repo_id}
 
 Output Paths:
     - Results directory: results/{setting}/{model}/
@@ -472,7 +472,7 @@ def evaluate_repo(
     """
     # For large-scale repos, we'll determine docker_image per file
     # For original repos, use single docker image
-    default_docker_image = f"wlqmfl0990/recube:{repo_id}"
+    default_docker_image = f"recubeanon2026/recube:{repo_id}"
 
     # Create reverse mapping: file -> original repo_id for large-scale repos
     file_to_repo_id = {}
@@ -556,7 +556,7 @@ def evaluate_repo(
         if file_to_repo_id and source_file in file_to_repo_id:
             # Large-scale repo: use original repo's docker image
             orig_repo_id = file_to_repo_id[source_file]
-            docker_image = f"wlqmfl0990/recube:{orig_repo_id}"
+            docker_image = f"recubeanon2026/recube:{orig_repo_id}"
         else:
             # Original repo: use default docker image
             docker_image = default_docker_image

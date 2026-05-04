@@ -62,7 +62,7 @@ Input Requirements:
     - Generated outputs: outputs/{setting}/{model}/{repo_id}/*.py
     - Test metadata: data/tests/{repo_id}/test_metadata.json
     - Test classifications: data/test_classifications/{repo_id}.json
-    - Docker images: wlqmfl0990/recube:{repo_id}
+    - Docker images: recubeanon2026/recube:{repo_id}
 
 Output:
     - Results directory: results/{setting}/{model}/
