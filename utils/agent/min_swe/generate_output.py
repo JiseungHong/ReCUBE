@@ -340,7 +340,7 @@ def main():
         'max_turns_per_file': MAX_TURNS,
         'config': str(CONFIG_PATH),
         'mode': args.mode,
-        'version': 'v2-real-agent',
+        'version': 'mini-swe-agent',
         'repositories': {},
         'total_files': 0,
         'total_completed': 0,

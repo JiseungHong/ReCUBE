@@ -295,7 +295,7 @@ def cmd_show_implementation_context(args):
         except Exception as e:
             print(f"Error computing similar files: {e}")
             print("Falling back to simple name-based matching...")
-            # Fallback to old method
+            # Fallback method
             _show_similar_files_fallback(target, graph)
     else:
         # Fallback if similar_files module not available

@@ -23,7 +23,7 @@ configs:
 
 # Data
 
-This directory contains all benchmark data for the Re2Code repository-level code reconstruction benchmark.
+This directory contains all benchmark data for ReCUBE, a repository-level code reconstruction benchmark.
 
 ## Download
 
@@ -43,12 +43,12 @@ snapshot_download(repo_id="recube-anon-2026/recube-data", repo_type="dataset", l
 
 Alternatively, you can clone the repository:
 ```bash
-git clone [https://huggingface.co/datasets/recube-anon-2026/recube-data](https://huggingface.co/datasets/recube-anon-2026/recube-data) data/
+git clone https://huggingface.co/datasets/recube-anon-2026/recube-data data/
 ```
 
 ## Graphs (`graphs/`)
 
-Dependency graphs in NetworkX format (`.pkl` files) for each functional subset.
+Dependency graphs in NetworkX format (`.pkl` files), one per functional subset (named by `repo_id`).
 
 **Usage**: Used by the graph-guided setting (`bash_only_graph_setting`) to provide efficient context navigation tools.
 
@@ -78,7 +78,7 @@ Format: NetworkX MultiDiGraph serialized with pickle
   - Methods: {file_path}:{class_name}.{method_name} (e.g., app/agent/base.py:BaseAgent.run)
   - Functions: {file_path}:{function_name} (e.g., app/utils.py:setup_logger)
 
-**Files**: One graph per functional subset (e.g., `0.pkl`, `1.pkl`, ..., `54.pkl`)
+**Files**: One graph per functional subset, named by `repo_id` (e.g., `0.pkl`, `2.pkl`, ..., `54.pkl`)
 
 ## Prompts (`prompts/`)
 
@@ -107,7 +107,7 @@ Repository context files in text format (`.txt`) for each functional subset. For
 </implementations>
 ```
 
-**Files**: One prompt file per functional subset (e.g., `0.txt`, `1.txt`, ..., `54.txt`)
+**Files**: One prompt file per functional subset, named by `repo_id` (e.g., `0.txt`, `2.txt`, ..., `54.txt`)
 
 ## Testcases (`tests/`)
 
@@ -126,7 +126,7 @@ tests/
 │   ├── app_agent_manus_test.py
 |   ├── ...
 │   └── test_metadata.json
-├── 1/                          # Functional subset 1
+├── 2/                          # Functional subset 2
 │   └── ...
 ```
 
@@ -167,7 +167,7 @@ tests/
 
 External vs internal test classifications for analyzing model capabilities.
 
-**Structure**: One JSON file per functional subset (e.g., `0.json`, `1.json`)
+**Structure**: One JSON file per functional subset, named by `repo_id` (e.g., `0.json`, `2.json`)
 
 **Content**:
 ```json
@@ -197,7 +197,7 @@ External vs internal test classifications for analyzing model capabilities.
 
 ### `target.json`
 
-366 verified target files used for official evaluation (i.e., 40 functional subset, 366 instances).
+Target files used for official evaluation: 297 instances across 35 functional subsets (8,984 tests; 62.0% external, 38.0% internal), plus 106 instances in the large-scale extension (ReCUBE-large, 6 merged repositories). Large-scale entries are marked with `"is_large_scale": true` and map each target file to its functional subset via `source_repo_ids`.
 
 **Format**:
 ```json
@@ -218,17 +218,15 @@ External vs internal test classifications for analyzing model capabilities.
 
 ## Functional Subset Breakdown
 
-Detailed breakdown of the 40 functional subsets in our benchmark. Each entry represents a specific functional subset of a larger repository, selected to target distinct development capabilities.
+Detailed breakdown of the 35 functional subsets in our benchmark. Each entry represents a specific functional subset of a larger repository, selected to target distinct development capabilities.
 
-| ID | Repository | Functionality | Key Components |
+| repo_id | Repository | Functionality | Key Components |
 |----|------------|---------------|----------------|
 | 0 | OpenManus | Agent orchestration with sandbox execution | Base agent, ReAct pattern, tool execution |
-| 1 | nanochat | GPT training infrastructure | SFT/RL training, data loading, checkpointing |
 | 2 | DeepSeek-OCR | Vision-based OCR system | CLIP/SAM encoders, image/PDF processing |
 | 3 | deer-flow | Workflow-based agent with RAG | Graph orchestration, web crawling, retrieval |
 | 4 | openai-agents | Core runtime with guardrails | Agent execution, function schemas, prompts |
 | 5 | openai-agents | Computer use & file editing | Editor interface, computer control |
-| 6 | openai-agents | Multi-agent handoffs & visualization | Handoff filtering, workflow visualization |
 | 7 | openai-agents | MCP server with persistent memory | MCP integration, SQLite sessions |
 | 8 | openai-agents | Streaming chat completions | Stream handling, chat conversion |
 | 9 | openai-agents | Tracing & observability | Span data, trace processors, providers |
@@ -237,32 +235,29 @@ Detailed breakdown of the 40 functional subsets in our benchmark. Each entry rep
 | 12 | openai-agents | Voice pipeline (STT/TTS) | Speech-to-text, text-to-speech workflow |
 | 13 | serena | Semantic code editing | Symbol-level operations, code editor |
 | 14 | serena | LSP server implementation | Protocol handler, IDE integration |
-| 15 | blender-mcp | Blender MCP server | 3D modeling control, telemetry |
-| 16 | VibeVoice | Streaming voice generation | Diffusion models, DPM solver |
-| 17 | deepwiki-open | Multi-provider LLM API | OpenAI/DashScope/Ollama, embeddings |
-| 18 | context-engineering | Multi-agent system with RAG | Research agent, document ingestion |
-| 19 | context-engineering | Standalone RAG agent | CLI, embedding pipeline, DB utilities |
-| 20 | DeepCode | Multi-interface coding assistant | CLI & Streamlit UI, workflows |
-| 21 | DeepCode | Code implementation agent | MCP tools, Git ops, code indexing |
-| 22 | fastapi_mcp | FastAPI MCP server | HTTP/SSE transports, Auth0 |
-| 23 | RAG-Anything | Document processing RAG | Parser, processor, query system |
-| 24 | memvid | Video chat with retrieval | Indexing, encoding, ffmpeg processing |
-| 25 | trae-agent | Software engineering agent | Docker execution, bash/edit tools, CKG |
-| 26 | trae-agent | Trae with MCP integration | MCP tools, code knowledge graph |
-| 27 | langextract | Structured extraction with plugins | Multi-provider, Gemini/Ollama |
-| 28 | strix | Core agent with LLM management | Memory compression, request queuing |
-| 29 | strix | Tool runtime with Docker | File editing, web search, thinking tools |
-| 30 | strix | Interactive tool managers | Python/terminal/proxy/graph sessions |
-| 31 | strix | Browser automation & CLI | Browser control, tab management |
-| 32 | strix | Tool rendering system | UI component renderers registry |
-| 33 | strix | Terminal user interface | Text-based UI, utilities |
-| 34 | Wan2.1 | Video generation models | Text2video, image2video, VAE |
-| 35 | Second-Me | Personalized LLM data generation | L0/L1 generators, DPO training |
-| 36 | Second-Me | GGUF model utilities | Format conversion, quantization |
-| 37 | Second-Me | Personalized AI API services | Chat/knowledge/role management |
-| 38 | Second-Me | Complete AI application backend | Document processing, vector storage, MCP |
-| 39 | Spark-TTS | Neural TTS with tokenization | BiCodec, FSQ, Triton runtime |
+| 16 | blender-mcp | Blender MCP server | 3D modeling control, telemetry |
+| 17 | VibeVoice | Streaming voice generation | Diffusion models, DPM solver |
+| 18 | deepwiki-open | Multi-provider LLM API | OpenAI/DashScope/Ollama, embeddings |
+| 19 | context-engineering | Multi-agent system with RAG | Research agent, document ingestion |
+| 20 | context-engineering | Standalone RAG agent | CLI, embedding pipeline, DB utilities |
+| 21 | DeepCode | Multi-interface coding assistant | CLI & Streamlit UI, workflows |
+| 22 | DeepCode | Code implementation agent | MCP tools, Git ops, code indexing |
+| 23 | fastapi_mcp | FastAPI MCP server | HTTP/SSE transports, Auth0 |
+| 24 | RAG-Anything | Document processing RAG | Parser, processor, query system |
+| 25 | memvid | Video chat with retrieval | Indexing, encoding, ffmpeg processing |
+| 26 | trae-agent | Software engineering agent | Docker execution, bash/edit tools, CKG |
+| 27 | trae-agent | Trae with MCP integration | MCP tools, code knowledge graph |
+| 31 | langextract | Structured extraction with plugins | Multi-provider, Gemini/Ollama |
+| 32 | strix | Core agent with LLM management | Memory compression, request queuing |
+| 33 | strix | Tool runtime with Docker | File editing, web search, thinking tools |
+| 34 | strix | Interactive tool managers | Python/terminal/proxy/graph sessions |
+| 35 | strix | Browser automation & CLI | Browser control, tab management |
+| 37 | strix | Terminal user interface | Text-based UI, utilities |
+| 40 | Second-Me | GGUF model utilities | Format conversion, quantization |
+| 41 | Second-Me | Personalized AI API services | Chat/knowledge/role management |
+| 42 | Second-Me | Complete AI application backend | Document processing, vector storage, MCP |
+| 54 | Spark-TTS | Neural TTS with tokenization | BiCodec, FSQ, Triton runtime |
 
 **Diversity**:
-- 20 unique base repositories & 40 functional subsets
-- Domains: AI agents, ML training, OCR, TTS, RAG, code editing, MCP servers
+- 18 unique base repositories & 35 functional subsets
+- Domains: Tool & MCP Integration, LLM Services, Agent Frameworks, Code & Vision, Voice & Speech, and RAG

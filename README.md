@@ -17,12 +17,13 @@ A benchmark for evaluating LLMs on repository-level context utilization.
 
 ## Introduction
 
-[This is a fully anonymized GitHub repository for NeurIPS 2026 E&D track submission.]
+[This is an anonymized repository for peer review.]
 ReCUBE evaluates LLMs' ability to reconstruct complete, functional code files within real-world repositories:
 
 - **Repository-level understanding:** Full codebase context with multiple files and dependencies
-- **40 functional subsets** spanning AI agents, ML training, RAG systems, OCR, TTS, and more
-- **366 target files** with comprehensive test suites (10,785 tests)
+- **35 functional subsets** from 18 repositories, spanning agent frameworks, LLM services, tool & MCP integration, RAG, code & vision, and voice & speech
+- **297 target files** with usage-aware test suites (8,984 tests; external and internal)
+- **ReCUBE-large**: 106 instances over 6 merged repositories with contexts up to 338K tokens
 - **Docker-based evaluation** with reproducible, isolated test execution
 - **External/internal test classification** for detailed capability analysis
 
@@ -87,7 +88,7 @@ ReCUBE/
 │   ├── prompts/              # Repository context files
 │   ├── tests/                # Test suites and metadata
 │   ├── test_classifications/ # External/internal test labels
-│   └── target.json           # 366 target files (40 repos)
+│   └── target.json           # 297 target files (35 functional subsets) + 106 large-scale instances
 ├── outputs/                   # Generated code outputs
 │   └── {setting}/{model}/{repo_id}/
 ├── results/                   # Evaluation results
